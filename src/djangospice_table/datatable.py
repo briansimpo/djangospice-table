@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from typing import Any
-
+from urllib.parse import urlencode
+from django.urls import reverse
 from djangospice_framework.core.serializer import serialize
+from djangospice_widget.conf import APP_NAME_KEY, MODEL_NAME_KEY
 
 from .widget import TableWidget
 
@@ -23,11 +25,25 @@ class DataTable(TableWidget):
         - django-tables2 table construction
         - actions
 
-    DynamicTable is only responsible for exposing that state as a
+    DataTable is only responsible for exposing that state as a
     declarative table definition.
     """
 
     type = "table"
+
+    template = "djangospice_table/datatable.html"
+
+    @property
+    def endpoint(self) -> str:
+        url = reverse(
+            self.namespace,
+            kwargs={
+                APP_NAME_KEY: self.app_label,
+                MODEL_NAME_KEY: self.name,
+            },
+        )
+        params = {k: v for k, v in self.kwargs.items() if k != "id"}
+        return f"{url}?{urlencode(params)}" if params else url
 
     def get_definition(self) -> dict[str, Any]:
         """
@@ -95,7 +111,7 @@ class DataTable(TableWidget):
         """
         Serialize the currently visible table rows.
 
-        Values are passed through the framework serializer so DynamicTable
+        Values are passed through the framework serializer so DataTable
         does not maintain its own serialization rules.
         """
         rows: list[dict[str, Any]] = []
@@ -312,6 +328,6 @@ class DataTable(TableWidget):
 
     def get_response_data(self) -> dict[str, Any]:
         """
-        Return the JSON-ready DynamicTable payload.
+        Return the JSON-ready DataTable payload.
         """
         return serialize(self.get_definition())
