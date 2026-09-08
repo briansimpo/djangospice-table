@@ -286,14 +286,6 @@ class StudentTableWidget(TableWidget):
     selectable = True
 ```
 
-Customize the selection parameter:
-
-```python
-class StudentTableWidget(TableWidget):
-    selectable = True
-    selection_parameter = "students"
-```
-
 ---
 
 ## Actions
