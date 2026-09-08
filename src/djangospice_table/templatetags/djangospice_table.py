@@ -2,25 +2,28 @@ from __future__ import annotations
 
 from django import template
 from django.templatetags.static import static
-from djangospice_lookup.apps import namespace
+
+from djangospice_table.apps import namespace
+
 
 register = template.Library()
 
 
 TABLE_CSS = f"{namespace}/table.css"
-TABLE_JS = f"{namespace}/table.js"
+DATATABLE_JS = f"{namespace}/datatable.js"
+CONTEXTMENU_JS = f"{namespace}/contextmenu.js"
 
 
 def _table_css() -> str:
-    return (
-        f'<link rel="stylesheet" href="{static(TABLE_CSS)}">'
-    )
+    return f'<link rel="stylesheet" href="{static(TABLE_CSS)}">'
 
 
-def _table_js() -> str:
-    return (
-        f'<script src="{static(TABLE_JS)}" defer></script>'
-    )
+def _datatable_js() -> str:
+    return f'<script src="{static(DATATABLE_JS)}" defer></script>'
+
+
+def _contextmenu_js() -> str:
+    return f'<script src="{static(CONTEXTMENU_JS)}" defer></script>'
 
 
 @register.simple_tag
@@ -30,17 +33,24 @@ def djangospice_table_css() -> str:
 
 
 @register.simple_tag
-def djangospice_lookup_js() -> str:
-    """Render the DjangoSpice Table JavaScript."""
-    return _table_js()
+def djangospice_table_js() -> str:
+    """Render the DjangoSpice DataTable JavaScript."""
+    return _datatable_js()
 
 
 @register.simple_tag
-def djangospice_lookup_assets() -> str:
+def djangospice_table_contextmenu_js() -> str:
+    """Render the DjangoSpice Table context-menu JavaScript."""
+    return _contextmenu_js()
+
+
+@register.simple_tag
+def djangospice_table_assets() -> str:
     """Render all DjangoSpice Table assets."""
     return "\n".join(
         (
             _table_css(),
-            _table_js(),
+            _datatable_js(),
+            _contextmenu_js(),
         )
     )
