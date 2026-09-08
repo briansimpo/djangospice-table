@@ -1,0 +1,25 @@
+
+{% if table_actions %}
+<div class="flex items-center gap-2">
+
+    {% block actions %}
+        {% for action in table_actions %}
+            <button
+                type="button"
+                {{ action.htmx }}
+                class="{{ action.css_class|default:'btn btn-sm' }}"
+                title="{{ action.label }}"
+            >
+                {% if action.icon %}
+                    {{ action.icon }}
+                {% endif %}
+
+                <span class="sr-only">
+                    {{ action.label }}
+                </span>
+            </button>
+        {% endfor %}
+    {% endblock actions %}
+
+</div>
+{% endif %}

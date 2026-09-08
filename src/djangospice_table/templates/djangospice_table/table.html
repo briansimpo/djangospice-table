@@ -1,0 +1,30 @@
+{% load django_tables2 %}
+
+{% block table_wrapper %}
+<div 
+    id="{{ content_id }}"   
+    data-table
+    data-url="{{ table_url }}"
+    data-target="{{ htmx_target }}" 
+    class="table-container flex w-full flex-col gap-4">
+
+    {% block table_toolbar %}
+        {% include "djangospice_table/toolbar.html" %}
+    {% endblock table_toolbar %}
+
+
+    {% block table_content %}
+        {% include "djangospice_table/table_container.html" %}
+    {% endblock table_content %}
+
+
+    {% block table_pagination %}
+        {% include "djangospice_table/pagination.html" %}
+    {% endblock table_pagination %}
+
+    {% if context_menu_enabled %}
+        {% include "djangospice_table/context_menu.html" %}
+    {% endif %}
+
+</div>
+{% endblock table_wrapper %}

@@ -1,0 +1,16 @@
+{% load django_tables2 %}
+{% load l10n %}
+
+<tbody {{ table.attrs.tbody.as_html }}>
+
+    {% for row in table.paginated_rows %}
+
+        {% include "djangospice_table/table_row.html" %}
+
+    {% empty %}
+
+        {% include "djangospice_table/table_empty.html" %}
+
+    {% endfor %}
+
+</tbody>

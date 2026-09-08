@@ -1,0 +1,42 @@
+
+{% load django_tables2 %}
+
+{% if table.show_header %}
+<thead {{ table.attrs.thead.as_html }}>
+
+    {% block table_head_row %}
+    <tr>
+
+        {% for column in table.columns %}
+
+            {% block table_head_cell %}
+            <th {{ column.attrs.th.as_html }}>
+
+                {% if column.orderable %}
+
+                    <a
+                        href="{% querystring_replace table.prefixed_order_by_field=column.order_by_alias.next %}"
+                        hx-get="{% querystring_replace table.prefixed_order_by_field=column.order_by_alias.next %}"
+                        hx-target="{{ htmx_target }}"
+                        hx-swap="outerHTML"
+                        hx-push-url="true"
+                    >
+                        {{ column.header }}
+                    </a>
+
+                {% else %}
+
+                    {{ column.header }}
+
+                {% endif %}
+
+            </th>
+            {% endblock table_head_cell %}
+
+        {% endfor %}
+
+    </tr>
+    {% endblock table_head_row %}
+
+</thead>
+{% endif %}

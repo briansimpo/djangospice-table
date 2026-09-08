@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling>=1.24.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "djangospice-table"
+version = "0.1.0"
+description = "Interactive server-side table widget for Django applications."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+authors = [
+    { name = "Brian Simpokolwe", email = "briansimpokolwe@gmail.com" }
+]
+
+keywords = [
+    "django",
+    "table",
+    "djangospice_table",
+    "django_tables2",
+]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Django",
+    "Framework :: Django :: 5",
+    "Framework :: Django :: 6",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Education",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+
+# --- Core Dependencies (Batteries Included) ---
+dependencies = [
+    "django-filter>=24.0",
+    "django-tables2>=2.7",
+    "djangospice-widget>=0.1",
+    
+]
+
+# --- Development Tools ---
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-django",
+    "coverage",
+    "black",
+    "isort",
+    "ruff",
+]
+
+[project.urls]
+Homepage = "https://github.com/briansimpo/djangospice_table"
+Documentation = "https://github.com/briansimpo/djangospice_table#readme"
+Source = "https://github.com/briansimpo/djangospice_table"
+Issues = "https://github.com/briansimpo/djangospice_table/issues"
+
+# --- Hatch Build Configuration ---
+[tool.hatch.build.targets.wheel]
+packages = ["src/djangospice_table"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""

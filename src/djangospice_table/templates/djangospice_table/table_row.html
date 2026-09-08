@@ -1,0 +1,37 @@
+
+{% load l10n %}
+
+{% block table_row %}
+<tr {{ row.attrs.as_html }}   
+    data-table-row
+    data-object-id="{{ row.record.pk }}"
+>
+
+    {% for column, cell in row.items %}
+
+        {% block table_cell %}
+        <td {{ column.attrs.td.as_html }}>
+
+            {% if column.localize == None %}
+
+                {{ cell }}
+
+            {% elif column.localize %}
+
+                {{ cell|localize }}
+
+            {% else %}
+
+                {{ cell|unlocalize }}
+
+            {% endif %}
+
+        </td>
+        {% endblock table_cell %}
+
+    {% endfor %}
+
+</tr>
+{% endblock table_row %}
+
+

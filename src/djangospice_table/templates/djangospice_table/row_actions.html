@@ -1,0 +1,20 @@
+{% if row_actions %}
+<div class="flex items-center justify-end gap-1">
+    {% block row_actions %}
+        {% for action in row_actions %}
+            <button
+                type="button"
+                {{ action.htmx }}
+                class="{{ action.css_class|default:'btn btn-sm btn-ghost' }}"
+                title="{{ action.label }}"
+            >
+                {% if action.icon %}
+                    {{ action.icon }}
+                {% else %}
+                    {{ action.label }}
+                {% endif %}
+            </button>
+        {% endfor %}
+    {% endblock row_actions %}
+</div>
+{% endif %}

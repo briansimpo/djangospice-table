@@ -1,0 +1,42 @@
+{% if show_filters and filterset %}
+<form
+    method="get"
+    action="{{ table_url }}"
+    class="flex flex-wrap items-center gap-2"
+    hx-get="{{ table_url }}"
+    hx-target="{{ htmx_target }}"
+    hx-swap="outerHTML"
+    hx-push-url="true"
+    hx-indicator="{{ htmx_indicator }}"
+>
+
+    {% block filter_fields %}
+        {% for field in filterset.form %}
+            <div>
+                {{ field }}
+            </div>
+        {% endfor %}
+    {% endblock filter_fields %}
+
+    {% block filter_buttons %}
+
+        <button type="submit" class="btn btn-sm btn-primary">
+            Filter
+        </button>
+
+        <a
+            href="{{ table_url }}"
+            hx-get="{{ table_url }}"
+            hx-target="{{ htmx_target }}"
+            hx-swap="outerHTML"
+            hx-push-url="true"
+            hx-indicator="{{ htmx_indicator }}"
+            class="btn btn-sm btn-secondary"
+        >
+            Reset
+        </a>
+
+    {% endblock filter_buttons %}
+
+</form>
+{% endif %}

@@ -1,0 +1,48 @@
+{% if show_search and search_enabled %}
+<form class="flex min-w-0 flex-1 items-center"
+    method="get"
+    action="{{ table_url }}"
+    hx-get="{{ table_url }}"
+    hx-target="{{ htmx_target }}"
+    hx-swap="outerHTML"
+    hx-push-url="true"
+    hx-indicator="{{ htmx_indicator }}"
+   
+>
+
+    <div class="relative w-full max-w-sm">
+
+        <input class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 pl-3 pr-9 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+            type="search"
+            name="{{ search_parameter }}"
+            value="{{ search_term }}"
+            placeholder="Search..."
+            autocomplete="off"
+            hx-get="{{ table_url }}"
+            hx-target="{{ htmx_target }}"
+            hx-swap="outerHTML"
+            hx-trigger="keyup changed delay:500ms, search"
+            hx-push-url="true"  
+        >
+
+        {% if search_term %}
+            <button
+                type="button"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                aria-label="Clear search"
+                onclick="
+                    const input = this.previousElementSibling;
+                    input.value = '';
+                    input.dispatchEvent(
+                        new Event('search', { bubbles: true })
+                    );
+                "
+            >
+                &times;
+            </button>
+        {% endif %}
+
+    </div>
+
+</form>
+{% endif %}

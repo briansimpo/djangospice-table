@@ -1,0 +1,21 @@
+{% if table.show_footer %}
+<tfoot {{ table.attrs.tfoot.as_html }}>
+
+    {% block table_foot_row %}
+    <tr>
+
+        {% for column in table.columns %}
+
+            {% block table_foot_cell %}
+            <td {{ column.attrs.tf.as_html }}>
+                {{ column.footer }}
+            </td>
+            {% endblock table_foot_cell %}
+
+        {% endfor %}
+
+    </tr>
+    {% endblock table_foot_row %}
+
+</tfoot>
+{% endif %}

@@ -1,0 +1,39 @@
+
+{% load django_tables2 %}
+{% load i18n l10n %}
+
+{% if selectable %}
+<form id="{{ selection_id }}" method="post">
+    {% csrf_token %}
+{% endif %}
+
+
+{% block table %}
+<div class="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+    {% include "djangospice_table/page_size.html" %}
+
+    <table {% render_attrs table.attrs id=table_id %}>
+
+        {% block table_head %}
+            {% include "djangospice_table/table_head.html" %}
+        {% endblock table_head %}
+
+
+        {% block table_body %}
+            {% include "djangospice_table/table_body.html" %}
+        {% endblock table_body %}
+
+
+        {% block table_foot %}
+            {% include "djangospice_table/table_foot.html" %}
+        {% endblock table_foot %}
+
+    </table>
+
+</div>
+{% endblock table %}
+
+
+{% if selectable %}
+</form>
+{% endif %}

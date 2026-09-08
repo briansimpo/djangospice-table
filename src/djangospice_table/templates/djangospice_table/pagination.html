@@ -1,0 +1,106 @@
+{% load i18n %}
+
+{% if page and page.total > 1 %}
+
+<nav
+    class="flex items-center justify-between pt-2"
+    aria-label="{% trans 'Table navigation' %}"
+>
+
+    {% block pagination_summary %}
+    <span class="text-sm text-gray-500">
+        {% trans "Page" %}
+        <span class="font-semibold text-gray-900">
+            {{ page.number }}
+        </span>
+
+        {% trans "of" %}
+
+        <span class="font-semibold text-gray-900">
+            {{ page.total }}
+        </span>
+    </span>
+    {% endblock pagination_summary %}
+
+
+    {% block pagination_navigation %}
+    <ul class="inline-flex h-8 -space-x-px text-sm">
+
+        {% if page.has_previous %}
+            {% block pagination_previous %}
+            <li>
+                <a
+                    href="{{ page.previous }}"
+                    hx-get="{{ page.previous }}"
+                    hx-target="{{ htmx_target }}"
+                    hx-swap="outerHTML"
+                    hx-push-url="true"
+                    class="flex h-8 items-center justify-center rounded-l-lg border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                >
+                    {% trans "Previous" %}
+                </a>
+            </li>
+            {% endblock pagination_previous %}
+        {% endif %}
+
+
+        {% block pagination_range %}
+        {% for number, url, is_current in page.pages %}
+
+            <li>
+
+                {% if url is None or number == "..." %}
+
+                    <span
+                        class="flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500"
+                    >
+                        {{ number }}
+                    </span>
+
+                {% else %}
+
+                    <a
+                        href="{{ url }}"
+                        hx-get="{{ url }}"
+                        hx-target="{{ htmx_target }}"
+                        hx-swap="outerHTML"
+                        hx-push-url="true"
+                        class="flex h-8 items-center justify-center border border-gray-300 px-3 leading-tight {% if is_current %}bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700{% else %}bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700{% endif %}"
+                        {% if is_current %}
+                            aria-current="page"
+                        {% endif %}
+                    >
+                        {{ number }}
+                    </a>
+
+                {% endif %}
+
+            </li>
+
+        {% endfor %}
+        {% endblock pagination_range %}
+
+
+        {% if page.has_next %}
+            {% block pagination_next %}
+            <li>
+                <a
+                    href="{{ page.next }}"
+                    hx-get="{{ page.next }}"
+                    hx-target="{{ htmx_target }}"
+                    hx-swap="outerHTML"
+                    hx-push-url="true"
+                    class="flex h-8 items-center justify-center rounded-r-lg border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                >
+                    {% trans "Next" %}
+                </a>
+            </li>
+            {% endblock pagination_next %}
+        {% endif %}
+
+    </ul>
+    {% endblock pagination_navigation %}
+
+</nav>
+
+{% endif %}
