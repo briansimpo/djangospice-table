@@ -41,7 +41,7 @@ classifiers = [
 dependencies = [
     "django-filter>=24.0",
     "django-tables2>=2.7",
-    "djangospice-widget>=0.1",
+    "djangospice-widget>=0.3",
     
 ]
 
@@ -57,10 +57,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/briansimpo/djangospice_table"
-Documentation = "https://github.com/briansimpo/djangospice_table#readme"
-Source = "https://github.com/briansimpo/djangospice_table"
-Issues = "https://github.com/briansimpo/djangospice_table/issues"
+Homepage = "https://github.com/briansimpo/djangospice-table"
+Documentation = "https://github.com/briansimpo/djangospice-table#readme"
+Source = "https://github.com/briansimpo/djangospice-table"
+Issues = "https://github.com/briansimpo/djangospice-table/issues"
 
 # --- Hatch Build Configuration ---
 [tool.hatch.build.targets.wheel]
