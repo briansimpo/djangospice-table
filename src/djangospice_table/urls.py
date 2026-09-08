@@ -6,7 +6,7 @@ from .views import DataTableView
 
 urlpatterns = [
     path(
-        f"datatable/{APP_NAME_URL_KEY}>/{MODEL_NAME_URL_KEY}/", 
+        f"api/tables/{APP_NAME_URL_KEY}>/{MODEL_NAME_URL_KEY}/", 
         DataTableView.as_view(),
         name=namespace,
     ),
