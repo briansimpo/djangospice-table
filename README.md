@@ -1,8 +1,8 @@
-# `djangospice_table`
+# djangospice_table
 
 **Reusable, composable, server-side data tables for Django.**
 
-`djangospice_table` provides declarative data table widgets for Django applications, built on top of `django-tables2`, with integrated filtering, searching, pagination, actions, HTMX-compatible rendering, and optional dynamic JavaScript rendering.
+`djangospice-table` provides declarative data table widgets for Django applications, built on top of `django-tables2`, with integrated filtering, searching, pagination, actions, HTMX-compatible rendering, and optional dynamic JavaScript rendering.
 
 ---
 
