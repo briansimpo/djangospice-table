@@ -89,7 +89,6 @@ class TableWidget(Widget):
     # ------------------------------------------------------------------
 
     selectable: ClassVar[bool] = False
-    selection_parameter: ClassVar[str] = "selected_ids"
 
     # ------------------------------------------------------------------
     # UI
@@ -303,7 +302,7 @@ class TableWidget(Widget):
             htmx_indicator=self.htmx_indicator,
 
             selectable=self.selectable,
-            selection_parameter=self.selection_parameter,
+            objects_parameter=self.objects_parameter,
 
             toolbar=self.toolbar,
             show_search=self.show_search,
