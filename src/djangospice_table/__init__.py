@@ -1,7 +1,7 @@
 from .widget import TableWidget
-from .datatable import DynamicTable
+from .datatable import DataTable
 
 __all__ = [
     "TableWidget",
-    "DynamicTable",
+    "DataTable",
 ]
