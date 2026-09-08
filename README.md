@@ -276,31 +276,6 @@ The resulting available options will not exceed the configured maximum.
 
 ---
 
-## Limit Parameter
-
-The default page-size parameter is:
-
-```text
-page_size
-```
-
-It can be changed to `limit`:
-
-```python
-class StudentTableWidget(TableWidget):
-    page_size_parameter = "limit"
-```
-
-This allows URLs such as:
-
-```text
-/students/?limit=100
-```
-
-The page limit works together with the table's existing search, filter, and pagination state.
-
----
-
 ## Row Selection
 
 Enable row selection:
