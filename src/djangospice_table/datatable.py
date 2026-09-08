@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from typing import Any
 from urllib.parse import urlencode
+
+from django import forms
 from django.urls import reverse
+
 from djangospice_framework.core.serializer import serialize
 from djangospice_widget.conf import APP_NAME_KEY, MODEL_NAME_KEY
 
@@ -33,6 +36,10 @@ class DataTable(TableWidget):
 
     template = "djangospice_table/datatable.html"
 
+    # ------------------------------------------------------------------
+    # Endpoint
+    # ------------------------------------------------------------------
+
     @property
     def endpoint(self) -> str:
         url = reverse(
@@ -42,8 +49,18 @@ class DataTable(TableWidget):
                 MODEL_NAME_KEY: self.name,
             },
         )
-        params = {k: v for k, v in self.kwargs.items() if k != "id"}
+
+        params = {
+            key: value
+            for key, value in self.kwargs.items()
+            if key != "id"
+        }
+
         return f"{url}?{urlencode(params)}" if params else url
+
+    # ------------------------------------------------------------------
+    # Definition
+    # ------------------------------------------------------------------
 
     def get_definition(self) -> dict[str, Any]:
         """
@@ -127,7 +144,7 @@ class DataTable(TableWidget):
             row["id"] = serialize(record.pk)
 
             if self.row_actions:
-                row["actions"] = self.get_row_actions(record)
+                row["actions"] = self.get_row_actions()
 
             rows.append(row)
 
@@ -139,33 +156,27 @@ class DataTable(TableWidget):
 
     def get_filters(self) -> list[dict[str, Any]]:
         """
-        Return filter definitions for the client.
+        Return declarative filter definitions for the client.
 
-        Filter widgets may expose a remote lookup configuration rather
-        than embedding their complete option set in the table payload.
+        A filter whose Django form widget exposes lookup metadata is
+        represented as a remote lookup filter.
+
+        DataTable does not import or depend on the lookup package.
         """
         if not self.filterset:
             return []
 
-        filters: list[dict[str, Any]] = []
+        return [
+            self.serialize_filter(name, field)
+            for name, field in self.filterset.filters.items()
+        ]
 
-        for name, field in self.filterset.filters.items():
-            filters.append(self.serialize_filter(name, field))
-
-        return filters
-
-    def serialize_filter(
-        self,
-        name: str,
-        field: Any,
-    ) -> dict[str, Any]:
+    def serialize_filter(self, name: str,field: Any) -> dict[str, Any]:
         """
-        Convert a django-filter field into a declarative filter.
-
-        Subclasses can override this for application-specific filter
-        metadata or lookup-backed filters.
+        Convert a django-filter filter into a declarative filter.
         """
         form_field = field.field
+        widget = form_field.widget
 
         definition: dict[str, Any] = {
             "name": name,
@@ -173,6 +184,18 @@ class DataTable(TableWidget):
             "label": str(field.label or name),
             "required": bool(form_field.required),
         }
+
+        value = self.get_filter_value(name)
+
+        if value is not None:
+            definition["value"] = serialize(value)
+
+        if self.is_lookup_widget(widget):
+            return self.serialize_lookup_filter(
+                definition,
+                form_field,
+                widget,
+            )
 
         choices = getattr(form_field, "choices", None)
 
@@ -187,15 +210,195 @@ class DataTable(TableWidget):
 
         return definition
 
-    def get_filter_type(self, field: Any) -> str:
+    # ------------------------------------------------------------------
+    # Lookup Filters
+    # ------------------------------------------------------------------
+
+    def is_lookup_widget(self, widget: Any) -> bool:
+        """
+        Determine whether a form widget exposes the lookup contract.
+
+        This deliberately uses duck typing instead of importing a concrete
+        LookupWidget class. DataTable therefore has no dependency on the
+        lookup package.
+        """
+        return (
+            hasattr(widget, "lookup_url")
+            and hasattr(widget, "page_size")
+            and hasattr(widget, "min_search_length")
+        )
+
+    def serialize_lookup_filter(self, definition: dict[str, Any], field: forms.Field, widget: Any) -> dict[str, Any]:
+        """
+        Serialize the public lookup configuration exposed by a form widget.
+        """
+        definition["type"] = "lookup"
+        definition["multiple"] = self.is_multi_select(
+            field,
+            widget,
+        )
+
+        source: dict[str, Any] = {
+            "type": "remote",
+            "endpoint": widget.lookup_url,
+            "searchable": True,
+            "page_size": widget.page_size,
+        }
+
+        if widget.min_search_length:
+            source["min_search_length"] = widget.min_search_length
+
+        config = getattr(widget, "config", None)
+
+        if config is not None:
+            search_param = getattr(
+                config,
+                "search_param",
+                None,
+            )
+
+            page_param = getattr(
+                config,
+                "page_param",
+                None,
+            )
+
+            page_size_param = getattr(
+                config,
+                "page_size_param",
+                None,
+            )
+
+            if search_param:
+                source["search_parameter"] = search_param
+
+            if page_param:
+                source["page_parameter"] = page_param
+
+            if page_size_param:
+                source["page_size_parameter"] = page_size_param
+
+        definition["source"] = source
+
+        placeholder = getattr(
+            widget,
+            "placeholder",
+            None,
+        )
+
+        if placeholder:
+            definition["placeholder"] = placeholder
+
+        search_placeholder = getattr(
+            widget,
+            "search_placeholder",
+            None,
+        )
+
+        if search_placeholder:
+            definition["search_placeholder"] = search_placeholder
+
+        definition["allow_clear"] = getattr(
+            widget,
+            "allow_clear",
+            True,
+        )
+
+        dependencies = self.get_lookup_dependencies(widget)
+
+        if dependencies:
+            definition["dependencies"] = dependencies
+
+        return definition
+
+    def get_lookup_dependencies(self, widget: Any) -> list[str]:
+        """
+        Return dependency paths exposed by a lookup-capable widget.
+        """
+        resolver = getattr(
+            widget,
+            "get_lookup_dependencies",
+            None,
+        )
+
+        if callable(resolver):
+            return list(resolver())
+
+        dependencies = getattr(
+            widget,
+            "dependencies",
+            (),
+        )
+
+        return [
+            getattr(
+                dependency,
+                "path",
+                dependency,
+            )
+            for dependency in dependencies
+        ]
+
+    def is_multi_select(self, field: forms.Field, widget: Any) -> bool:
+        """
+        Determine whether the filter is a multi-select lookup.
+        """
+        explicit = getattr(
+            widget,
+            "multi_select",
+            None,
+        )
+
+        if explicit is not None:
+            return bool(explicit)
+
+        if isinstance(
+            field,
+            (
+                forms.ModelMultipleChoiceField,
+                forms.MultipleChoiceField,
+            ),
+        ):
+            return True
+
+        return bool(
+            getattr(widget, "attrs", {}).get("multiple")
+        )
+
+    # ------------------------------------------------------------------
+    # Filter Value
+    # ------------------------------------------------------------------
+
+    def get_filter_value(self, name: str) -> Any:
+        """
+        Return the current value for a filter.
+
+        The Django form remains the source of truth for filter state.
+        """
+        if not self.filterset:
+            return None
+
+        form = self.filterset.form
+
+        if name not in form.fields:
+            return None
+
+        if not form.is_bound:
+            return form.fields[name].initial
+
+        return form[name].value()
+
+    # ------------------------------------------------------------------
+    # Filter Type
+    # ------------------------------------------------------------------
+
+    def get_filter_type(self, field: forms.Field) -> str:
         """
         Return the declarative filter type.
 
         This deliberately uses Django form field characteristics rather
         than introducing a second filter abstraction.
         """
-        from django import forms
-
         if isinstance(field, forms.BooleanField):
             return "boolean"
 
@@ -264,63 +467,77 @@ class DataTable(TableWidget):
 
     def get_actions(self) -> dict[str, list[dict[str, Any]]]:
         return {
-            "table": self.serialize_actions(self.get_table_actions()),
-            "row": self.serialize_actions(self.get_row_actions()),
-            "bulk": self.serialize_actions(self.get_bulk_actions()),
+            "table": self.serialize_actions(
+                self.get_table_actions()
+            ),
+            "row": self.serialize_actions(
+                self.get_row_actions()
+            ),
+            "bulk": self.serialize_actions(
+                self.get_bulk_actions()
+            ),
         }
 
     def serialize_actions(self, actions: Any) -> list[dict[str, Any]]:
         """
         Serialize an Actions collection into declarative action metadata.
 
-        The exact action object remains owned by the existing action
-        infrastructure. This method only exposes its public metadata.
+        The existing action infrastructure remains responsible for the
+        action objects themselves.
         """
         if not actions:
             return []
 
-        result: list[dict[str, Any]] = []
-
-        for action in actions:
-            result.append(self.serialize_action(action))
-
-        return result
+        return [
+            self.serialize_action(action)
+            for action in actions
+        ]
 
     def serialize_action(self, action: Any) -> dict[str, Any]:
         """
         Convert an action into client-facing metadata.
-
-        Action implementations can expose additional metadata through
-        ``to_dict()``. Otherwise the common public attributes are used.
         """
         if hasattr(action, "to_dict") and callable(action.to_dict):
             return serialize(action.to_dict())
 
         definition: dict[str, Any] = {
-            "name": getattr(action, "name", action.__class__.__name__),
+            "name": getattr(
+                action,
+                "name",
+                action.__class__.__name__,
+            ),
         }
 
-        label = getattr(action, "label", None)
+        label = getattr(
+            action,
+            "label",
+            None,
+        )
 
         if label is not None:
             definition["label"] = str(label)
 
-        icon = getattr(action, "icon", None)
+        icon = getattr(
+            action,
+            "icon",
+            None,
+        )
 
         if icon is not None:
             definition["icon"] = icon
 
         return serialize(definition)
 
-    def get_row_actions(self, record: Any) -> list[dict[str, Any]]:
+    def get_row_actions(self) -> list[dict[str, Any]]:
         """
         Return actions available for a specific row.
 
-        The default implementation exposes the configured row actions.
         Applications can override this to apply per-row permission or
         availability rules.
         """
-        return self.serialize_actions(self.row_actions)
+        return self.serialize_actions(
+            self.row_actions
+        )
 
     # ------------------------------------------------------------------
     # Response
@@ -330,4 +547,6 @@ class DataTable(TableWidget):
         """
         Return the JSON-ready DataTable payload.
         """
-        return serialize(self.get_definition())
+        return serialize(
+            self.get_definition()
+        )
