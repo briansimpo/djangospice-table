@@ -31,6 +31,17 @@ Reusable, composable, server-side data tables for Django.
 
 ---
 
+## Requirements
+
+* Python 3.12+
+* Django 5.0+
+- `django-tables2`
+- `django-filter`
+- `djangospice-framework`
+- `djangospice-widget`
+
+---
+
 ## Installation
 
 ```bash
@@ -807,17 +818,6 @@ Load the assets once in the page:
 ```
 
 The DataTable is then discovered and initialized automatically.
-
----
-
-## Requirements
-
-- Python
-- Django
-- `django-tables2`
-- `django-filter`
-- `djangospice-framework`
-- `djangospice-widget`
 
 ---
 
