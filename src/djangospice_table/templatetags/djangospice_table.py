@@ -9,9 +9,9 @@ from djangospice_table.apps import namespace
 register = template.Library()
 
 
-TABLE_CSS = f"{namespace}/table.css"
-DATATABLE_JS = f"{namespace}/datatable.js"
-CONTEXTMENU_JS = f"{namespace}/contextmenu.js"
+TABLE_CSS = f"{namespace}/css/table.css"
+DATATABLE_JS = f"{namespace}/js/datatable.js"
+CONTEXTMENU_JS = f"{namespace}/js/contextmenu.js"
 
 
 def _table_css() -> str:
