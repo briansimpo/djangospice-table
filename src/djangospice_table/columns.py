@@ -1,6 +1,7 @@
 from typing import Any
 
 import django_tables2 as tables
+from django_tables2.columns.base import BoundColumn
 from django.utils.formats import number_format
 
 
@@ -47,7 +48,7 @@ class RowActionsColumn(tables.TemplateColumn):
         kwargs.setdefault("template_name", self.template_name)
         super().__init__(*args,**kwargs )
 
-    def render(self, record: Any, table: tables.Table, value: Any, bound_column: tables.BoundColumn, **kwargs: Any) -> str:
+    def render(self, record: Any, table: tables.Table, value: Any, bound_column: BoundColumn, **kwargs: Any) -> str:
         widget = table.widget
 
         return super().render(

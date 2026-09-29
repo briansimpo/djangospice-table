@@ -39,7 +39,7 @@ classifiers = [
 
 # --- Core Dependencies (Batteries Included) ---
 dependencies = [
-    "django-filter>=24.0",
+    "django-filter>=26.1",
     "django-tables2>=2.7",
     "djangospice-widget>=0.3",
     

@@ -1,8 +1,8 @@
 from __future__ import annotations
+from typing import Any
 
 import django_tables2 as tables
 
-from djangospice_table.widget import TableWidget
 from djangospice_table.columns import RowActionsColumn
 from .page import TablePaginationComposer
 
@@ -12,7 +12,7 @@ class TableComposer:
     Builds and configures a django-tables2 table.
     """
 
-    def __init__(self, widget: TableWidget) -> None:
+    def __init__(self, widget: Any) -> None:
         self.widget = widget
 
     def get_class(self) -> type[tables.Table]:
