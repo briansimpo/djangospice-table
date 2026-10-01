@@ -7,7 +7,7 @@ from django import forms
 from django.urls import reverse
 
 from djangospice_framework.core.serializer import serialize
-from djangospice_widget.conf import APP_NAME_KEY, MODEL_NAME_KEY
+from djangospice_widget.conf import APP_NAME_KEY, WIDGET_NAME_KEY
 
 from .widget import TableWidget
 
@@ -46,7 +46,7 @@ class DataTable(TableWidget):
             self.namespace,
             kwargs={
                 APP_NAME_KEY: self.app_label,
-                MODEL_NAME_KEY: self.name,
+                WIDGET_NAME_KEY: self.name,
             },
         )
 
